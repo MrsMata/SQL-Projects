@@ -1,4 +1,7 @@
 
+Server: PostgreSQL
+Database: ValentinaDB
+
 In this project, we'll be looking at the game_sold and reviews of 400 best-selling games from 1977 to 2020. We'll be comparing a dataset on game sales 
 with critic and user reviews to determine whether or not video games have improved as the gaming market has grown. So, when was the golden age of video
 games?
