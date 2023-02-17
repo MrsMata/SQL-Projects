@@ -73,8 +73,8 @@ ORDER BY avg_critic_score DESC;
 --- Ahh, there we are. The '90s have dominated again. Year 1990 starts off the list with a whopping 9.80 score!
 
   6.  We can run the conclusion that the '90s
-was the golden age of games, BUT that is just for critic score alone. What about the user score? The players are an important part of this analysis, so
-let's go do some more research.
+  was the golden age of games, BUT that is just for critic score alone. What about the user score? The players are an important part of this analysis, so
+  let's go do some more research.
   We'll start off with selecting the year, rounded average user_score, and count of games released in a given year. There will be aliases included in 
   this query. We will include only years with more than 4 reviewed games, group by year, order by avg_user_score, and limit just 10 results.
 
@@ -119,4 +119,4 @@ ORDER BY total_games_sold DESC;
 --- As a result, 2008 sold 175.07 games while 2002 only sold 58.67.
 
 Overall, by our discoveries through this data, critis loved games in 1990 and 1998, users loved them in 1990 as well, and 2008 was the best
-year for game developers. We can conclude that 1990 was the golden age of video games
+year for game developers. We can conclude that 1990 was the golden age of video games.
