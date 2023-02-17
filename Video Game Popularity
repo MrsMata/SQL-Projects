@@ -1,15 +1,22 @@
 
--- Select all information for the top ten best-selling games
--- Order the results from best-selling game down to tenth best-selling
+In this project, we'll be looking at the game_sold and reviews of 400 best-selling games from 1977 to 2020. We'll be comparing a dataset on game sales 
+with critic and user reviews to determine whether or not video games have improved as the gaming market has grown. So, when was the golden age of video
+games?
+
+  1. For this first query, I have selected all the info for the top ten best-selling games. We, then, ordered the results from best-selling game 
+  DESCENDING to the 10th best-selling.
 
 SELECT *
 FROM game_sales
 ORDER BY games_sold DESC
 LIMIT 10;
 
+ --- This query shows us that the top 10 best-selling games were between 1988 and 2017, topping the chart with 'Wii Sports for Wii' from 2006. Now, we 
+ will be using the reviews table to get a deaper insight on these games.
 
--- Join games_sales and reviews
--- Select a count of the number of games where both critic_score and user_score are null
+
+  2. Let's figure out how many games in game_sales table are missing a user score and a critic score. 
+  We're going to join games sales and reviews and select a count of the number of games where both critic score and user_score are null.
 
 SELECT COUNT(g.game)
 FROM game_sales as g
@@ -17,11 +24,12 @@ LEFT JOIN reviews as r
 ON g.game = r.game
 WHERE critic_score IS NULL AND user_score IS NULL;
 
+--- The results are in! A total of 31 games do NOT have a user_score and a critic score. That is less than 10% of the 400 total best-selling games.
 
--- Select release year and average critic score for each year, rounded and aliased
--- Join the game_sales and reviews tables
--- Group by release year
--- Order the data from highest to lowest avg_critic_score and limit to 10 results
+
+  3. Now, let's see which years critics loved the games the most! For this query, we will be looking for just the year and the average critic score.
+  we'll be selecting the release year and average critic score for each year. we will be rounding it and giving it an alias of avg_critic_score. We will 
+  also be joining the game_sales and reviews tables, grouping it by release year, and ordering the avg_critic_score DESCENDING, limiting the result to 10.
 
 SELECT g.year, ROUND(AVG(r.critic_score), 2) as avg_critic_score
 FROM game_sales as g
@@ -31,9 +39,12 @@ GROUP BY g.year
 ORDER BY avg_critic_score DESC
 LIMIT 10;
 
+--- Wow! The top average critic score is a 9.8 and the year is 1990. What a time for video games! The only decade not listed in the top 10 is the 2010s.
 
--- Paste your query from the previous task; update it to add a count of games released in each year called num_games
--- Update the query so that it only returns years that have more than four reviewed games
+  4. There is one oddball in the list of the previous query. The year 1892 has an average score of 9.00. Hmm, maybe that year didn't have as many games
+  to score? Let's find out!
+  I'm going to take the previous query, and simply update it to add a count of games released in each year and alias it as num_games. I'll have the 
+  query return years that have more than 4 reviewed games.
 
 SELECT g.year, COUNT(g.game) as num_games, ROUND(AVG(critic_score), 2) as avg_critic_score
 FROM game_sales as g
@@ -44,9 +55,13 @@ HAVING COUNT(g.game) > 4
 ORDER BY avg_critic_score DESC
 LIMIT 10;
 
+--- It seems 1998 is still at the top of the list, but the rest of the list has change dramatically. Now, it's full of scores for the 2000s and one 1999.
 
--- Select the year and avg_critic_score for those years that dropped off the list of critic favorites 
--- Order the results from highest to lowest avg_critic_score
+  5. With the previous 2 queries, we've created 2 new tables to work with, named top_critic_years and top_critic_years_more_than_four_games. Now that we
+  have the years that had to most reviewed games, what about the years that were dropped from the table because they didn't have any many reviewed games
+  but still had high critic scores?
+  To find that out, we will select the year and avg_critic_score for the years that dropped off the list of favorties, and order the avg_critic_score
+  DESCENDING.
 
 SELECT year, avg_critic_score
 FROM top_critic_years
@@ -55,10 +70,13 @@ SELECT year, avg_critic_score
 FROM top_critic_years_more_than_four_games
 ORDER BY avg_critic_score DESC;
 
+--- Ahh, there we are. The '90s have dominated again. Year 1990 starts off the list with a whopping 9.80 score!
 
--- Select year, an average of user_score, and a count of games released in a given year, aliased and rounded
--- Include only years with more than four reviewed games; group data by year
--- Order data by avg_user_score, and limit to ten results
+  6.  We can run the conclusion that the '90s
+was the golden age of games, BUT that is just for critic score alone. What about the user score? The players are an important part of this analysis, so
+let's go do some more research.
+  We'll start off with selecting the year, rounded average user_score, and count of games released in a given year. There will be aliases included in 
+  this query. We will include only years with more than 4 reviewed games, group by year, order by avg_user_score, and limit just 10 results.
 
 SELECT g.year, COUNT(g.game) as num_games, ROUND(AVG(r.user_score), 2) as avg_user_score
 FROM game_sales as g
@@ -69,8 +87,11 @@ HAVING COUNT(g.game) > 4
 ORDER BY avg_user_score DESC
 LIMIT 10;
 
+--- 1997; What a great year for top user scores! The table ranges from 1996-2010. A new generation of gamers, and expecations and critiques are on the 
+rise.
 
--- Select the year results that appear on both tables
+  7. For this next query, I am simply just going to INTERSECT these 2 new tables: top_user_years_more_than_four_games and 
+  top_critic_years_more_than_four_games. I will also be selecting the year for our desired field.
 
 SELECT year
 FROM top_user_years_more_than_four_games
@@ -78,9 +99,10 @@ INTERSECT
 SELECT year
 FROM top_critic_years_more_than_four_games;
 
+--- The result displays 3 years: 1998, 2008, and 2002.
 
--- Select year and sum of games_sold, aliased as total_games_sold; order results by total_games_sold descending
--- Filter game_sales based on whether each year is in the list returned in the previous task
+  8. We have figured out what years critics found as favorites and what years users found as favorites, but what about the game developers?
+  For this last query, we are going to find the total games sold in those three years, and order them by total games sold DESCENDING.
 
 SELECT g.year, SUM(g.games_sold) as total_games_sold
 FROM game_sales as g
@@ -93,3 +115,8 @@ WHERE g.year IN (
     )
 GROUP BY g.year
 ORDER BY total_games_sold DESC;
+
+--- As a result, 2008 sold 175.07 games while 2002 only sold 58.67.
+
+Overall, by our discoveries through this data, critis loved games in 1990 and 1998, users loved them in 1990 as well, and 2008 was the best
+year for game developers. We can conclude that 1990 was the golden age of video games
