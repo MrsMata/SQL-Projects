@@ -2,12 +2,34 @@
 Table Name: baby_names
 Columns: year, first_name, sex, num
 # of records: 12,649
+Dataset: United States Social Security Administration
 
+    In this project, we will be looking at popular names from 1920 through 2020. This dataset only contains names that were given more than 5,000 times 
+    in a year.
+    
+    1. Let's start out with an easy discovery. Let's simply try to find the names that have been used over 5,000 times every single year for 101 years.
+    We will select the first names and the total babies with that first_name, then group them by first_name, using HAVING for the filter to show all
+    names that appear in all 101 years. Then, we will order by the total number of babies with that first_name, DESCENDING.
 
--- Classify first names as 'Classic', 'Semi-classic', 'Semi-trendy', or 'Trendy'
--- Alias this column as popularity_type
--- Select first_name, the sum of babies who have ever had that name, and popularity_type
--- Order the results alphabetically by first_name
+SELECT first_name,
+    SUM(num)
+FROM baby_names
+GROUP BY first_name
+HAVING COUNT(year) = 101
+ORDER BY SUM(num) DESC;
+
+--- Out of the 8 results, it looks like only one female name is on the list, and 'Elizabeth' makes her place last on the board with a total of 1,436,286,
+    while 'James' tops it with 4,748,138. 
+    
+    2. In this query, we will be classifying names into 4 different "types" of names: Classic, Semi-classic, Semi-trendy, and Trendy, and they 
+    will put under a new field called popularity_type. We will be selecting first_name, popularity_type, and the sum of babies who have ever had that
+    name, then order the results alphabetically by first_name.
+    
+    Name Classifications:
+    Classic = 80+ years
+    Semi-classic = 50+ years
+    Semi-trendy = 20+ years
+    Trendy = anything less than 20 years
 
 SELECT first_name, SUM(num),
     CASE WHEN COUNT(year) > 80 THEN 'Classic'
@@ -18,11 +40,19 @@ FROM baby_names
 GROUP BY first_name
 ORDER BY first_name;
 
+--- Celebrity name 'Aaliyah' tops these results as a Trendy name. Going through all 547 rows, the 8 results from our very first query are the only 
+    Classic names. Trendy and Semi-trendy take over these results by a landslide.
+    Now, if we were to change the last line to:
+    
+        ORDER BY popularity_type;
+        
+    we will be able to see that there are exactly 14 names that are considered 'Classic', with 'William' topping the entire popularity chart over 101
+    years, and only 2 of those 'Classic' names are female!
 
--- RANK names by the sum of babies who have ever had that name (descending), aliasing as name_rank
--- Select name_rank, first_name, and the sum of babies who have ever had that name
--- Filter the data for results where sex equals 'F'
--- Limit to ten results
+    3. Because the previous discovery had just 2 female names as classic, let's focus more on all female names. In this query, let's take a look as ONLY
+    female names going forward. Let's use a window function to figure out the top 10 female names since 1920.
+    First, we'll rank names by the sum of babies who have ever had that name (descending), and aliasing it as name_rank. Then, select name_rank, 
+    first_name, and sum of babies who have ever had that name, then filter the results where sex is female ('F').
 
 SELECT 
     RANK() OVER(ORDER BY SUM(num) DESC) AS name_rank,
@@ -32,10 +62,12 @@ WHERE sex = 'F'
 GROUP BY first_name
 LIMIT 10;
 
+--- What name do you think made it on top? It looks like 'Mary' made it to the top, with 'Patricia' following. Were you expecting that?
 
--- Select only the first_name column
--- Filter for results where sex is 'F', year is greater than 2015, and first_name ends in 'a'
--- Group by first_name and order by the total number of babies given that first_name
+    4. A friend of yours heard you were doing some analysis on baby names. She is expecting a baby girl! She asked if we could find a popular
+    name that ends in 'a' and is newer than 2015. Let's help a momma out!
+    We will select the first_name column, filter so the sex is 'F', year is greater than 2015, and first_name ends in 'a'. Then, we'll group by
+    first_name and order the data by the total number of babies given that first_name.
 
 SELECT first_name
 FROM baby_names
@@ -44,11 +76,12 @@ WHERE sex = 'F' AND year > 2015
 GROUP BY first_name
 ORDER BY SUM(num) DESC;
 
+--- 'Olivia' is the top result from this query, but how did Olivia get to where she is now? 
 
--- Select year, first_name, num of Olivias in that year, and cumulative_olivias
--- Sum the cumulative babies who have been named Olivia up to that year; alias as cumulative_olivias
--- Filter so that only data for the name Olivia is returned.
--- Order by year from the earliest year to most recent
+    5. Let's explore the rise to popularity of 'Olivia'.
+    Select year, first_name, num of Olivias in that year, and cumulative_olivias. Then, sum the cumulative babies who have been named Olivia up to 
+    that year and alias it as cumulative_olivias, then filter so that only data for the name Olivia is returned. Order by year from the earliest 
+    year to most recent.
 
 SELECT year, first_name, num,
     SUM(num) OVER(ORDER BY year) AS cumulative_olivias
@@ -56,19 +89,23 @@ FROM baby_names
 WHERE first_name = 'Olivia'
 ORDER BY year;
 
+--- It looks like 'Olivia' started to make an appearance in 1991, breaking the 5,000 mark, then climaxed in 2016 at a total of 19,380 total babies 
+    named that year, then numbers slowly dwindled down each year after.
 
--- Select year and maximum number of babies given any one male name in that year, aliased as max_num
--- Filter the data to include only results where sex equals 'M'
+    6. In this next query, we are going to look back at the male baby names. We will look at the maximun number from every year, but won't list that
+    popular name from those years.
+    First, select the year and max number of babies given any one male name in that year, and alias it as max_num. Then, filter the results so the sex
+    is male.
 
 SELECT year, MAX(num) AS max_num
 FROM baby_names
 WHERE sex = 'M'
 GROUP BY year;
 
+--- Easy query with messy results. Let's order it up and add the names.
 
--- Select year, first_name given to the largest number of male babies, and num of babies given that name
--- Join baby_names to the code in the last task as a subquery
--- Order results by year descending
+    7. Select year, first_name given to the largest number of male babies, and number of babies given that name. Then, join baby_names to the code in 
+    the last task as a subquery, and order the results by year, descending.
 
 SELECT b.year, b.first_name, b.num
 FROM baby_names AS b
@@ -81,10 +118,13 @@ ON subquery.year = b.year
     AND subquery.max_num = b.num
 ORDER BY year DESC;
 
+--- 'Liam' tops the charts from 2017 to 2020, but it seems 'Michael' was the most popular for the most years --> 44 years to be exact, but let's show
+    it as a table.
 
--- Select first_name and a count of years it was the top name in the last task; alias as count_top_name
--- Use the code from the previous task as a common table expression
--- Group by first_name and order by count_top_name descending
+    8. Let's make the previous query result a bit easier to read, shall we? We are going to show the name and how many collective years they have
+    been at #1.
+    Select first_name and a count of years it was the top name in the last task and call it count_top_name. Then, use the code from the previous task 
+    as a common table expression. Finally, group by first_name and order by count_top_name, descending of course.
 
 WITH top_male_names AS(
     SELECT b.year, b.first_name, b.num
@@ -102,3 +142,5 @@ SELECT first_name, COUNT(first_name) AS count_top_name
 FROM top_male_names
 GROUP BY first_name
 ORDER BY COUNT(first_name) DESC;
+
+--- Yup! There it is. 'Michael' takes the #1 spot with 44 years, and 'David' take last with a whopping 1 year.
