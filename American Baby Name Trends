@@ -143,4 +143,4 @@ FROM top_male_names
 GROUP BY first_name
 ORDER BY COUNT(first_name) DESC;
 
---- Yup! There it is. 'Michael' takes the #1 spot with 44 years, and 'David' take last with a whopping 1 year.
+--- Yup! There it is. 'Michael' takes the #1 spot with 44 years, and 'David' takes last with a whopping 1 year.
